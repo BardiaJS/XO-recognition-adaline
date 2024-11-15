@@ -1,7 +1,6 @@
 package com.example.final_xo_adaline;
 
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
@@ -413,6 +412,7 @@ public class HelloController {
         }
 
         String isXO = "";
+        test();
         double result = adaline(input_array);
         if(result == 1) {
             isXO = "X";
@@ -425,7 +425,7 @@ public class HelloController {
 
     }
 
-    public static double [] training(){
+    public static void training(){
 
         String fileName = "xo-data-for-bardi.txt"; // Replace with your file name
         List<double[]> data = new ArrayList<>();
@@ -497,9 +497,7 @@ public class HelloController {
         System.out.println("Bias is: " + bias);
         System.out.println("Total epochs are: " + total_epochs);
 
-        return weight;
     }
-
     public static double adaline (double[][] main_inputs ) throws IOException {
         double [] list_of_inputs = new double[main_inputs.length * main_inputs[0].length];
         int length_of_inputs = list_of_inputs.length;
@@ -533,6 +531,42 @@ public class HelloController {
         }else{
             return  -1;
         }
+    }
+
+
+    public static void test(){
+        double success_rate = 0;
+        String fileName = "test.txt"; // Replace with your file name
+        List<double[]> data = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] numbers = line.split("\\s+"); // Split by whitespace
+                double[] row = new double [numbers.length];
+                for (int i = 0; i < numbers.length; i++) {
+                    row[i] = Float.parseFloat(numbers[i]);
+                }
+                data.add(row);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        double[][] test_inputs = data.toArray(new double [data.size()][]);
+        for(int i = 0; i < test_inputs.length ; i++){
+            double expected_result = test_inputs[i][25];
+            double net_input = bias;
+            for(int j = 0 ; j < 25 ; j++){
+                net_input += weight[j] * test_inputs[i][j];
+            }
+            double f = activation_function(net_input);
+            if(f == expected_result){
+                success_rate ++;
+            }
+        }
+        System.out.println((success_rate) /((double) test_inputs.length )+ " is success rate!");
+
     }
 
 
